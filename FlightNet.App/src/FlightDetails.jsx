@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react'
-import { getApiData } from './Utils.jsx'
+import { useParams } from "react-router-dom"
+import { getApiData, postApiData, putApiData, financial, isInteger } from './Utils.jsx'
 
 
 function FlightDetails() {
 
+  const { id } = useParams()
+
   const [flight, setFlight] = useState([{
+    flightId:null,
     originCityId: null,
     destinationCityId: null,
     planeId: null
@@ -24,7 +28,15 @@ function FlightDetails() {
         console.log(pls)
         setPlanes(pls)
 
-        const flt = await getApiData("http://localhost:5065/Flights/1")
+        const url = isInteger(id) ? `http://localhost:5065/Flights/${id}`:null
+        const flt = url ? await getApiData(url) : [{
+            flightId:null,
+            originCityId: null,
+            destinationCityId: null,
+            planeId: null,
+            consumption,
+            distance
+          }]
         console.log(flt)
         setFlight(flt)
     }
@@ -51,7 +63,19 @@ function FlightDetails() {
 
   const onSubmitClick = (e) => {
 		const run = async () => {
-			await postApiData("http://localhost:5065/Flights", flight)
+            id ? await putApiData("http://localhost:5065/Flights", 
+                {
+                    flightId:flight[0].flightId,
+                    originCityId: flight[0].originCityId,
+                    destinationCityId: flight[0].destinationCityId,
+                    planeId: flight[0].planeId
+                })
+               : await postApiData("http://localhost:5065/Flights", 
+                {
+                    originCityId: flight[0].originCityId,
+                    destinationCityId: flight[0].destinationCityId,
+                    planeId: flight[0].planeId
+                })
 		}
 		run()
   }
@@ -67,6 +91,9 @@ function FlightDetails() {
                 <div className="mb-3">
                     <label htmlFor="originCityName" className="form-label">Origin</label>
                     <select id="originCityName" className="form-select" onChange={onOriginCityChanged}>
+                        {(!flight.length || flight[0].originCityId == null)? 
+                            (<option value={0} selected>Select city</option>)    
+                            :(<option value={0}>Select city</option>)}
                         {cities.map((x, index)=>{
                             if (flight.length && flight[0].originCityId == x.cityId) {
                                 return (<option key={index} value={x.cityId} selected>{x.cityName}</option>)    
@@ -79,6 +106,9 @@ function FlightDetails() {
                 <div className="mb-3">
                     <label htmlFor="destinationCityName" className="form-label">Destination</label>
                     <select id="destinationCityName" className="form-select" onChange={onDestinationCityChanged}>
+                        {(!flight.length || flight[0].destinationCityId == null)? 
+                            (<option value={0} selected>Select city</option>)    
+                            :(<option value={0}>Select city</option>)}
                         {cities.map((x, index)=>{
                             if (flight.length && flight[0].destinationCityId == x.cityId) {
                                 return (<option key={index} value={x.cityId} selected>{x.cityName}</option>)    
@@ -91,6 +121,9 @@ function FlightDetails() {
                 <div className="mb-3">
                     <label htmlFor="planeName" className="form-label">Plane</label>
                     <select id="planeName" className="form-select" onChange={onPlaneChanged}>
+                        {(!flight.length || flight[0].planeId == null)? 
+                                (<option value={0} selected>Select plane</option>)    
+                                :(<option value={0}>Select city</option>)}
                         {planes.map((x, index)=>{
                             if (flight.length && flight[0].planeId == x.planeId) {
                                 return (<option key={index} value={x.planeId} selected>{x.planeNameAndNumber}</option>)
@@ -103,22 +136,22 @@ function FlightDetails() {
             </div>
             <div className='col-4'>
                 <div className="mb-3">
-                    <label htmlFor="consumption" className="form-label">Consumption</label>
-                    <input id="consumption" type='text' class="form-control" value={flight[0].consumption} disabled />
+                    <label htmlFor="consumption" className="form-label">Consumption (tons)</label>
+                    <input id="consumption" type='text' className="form-control" value={financial(flight[0].consumption)} disabled />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="distance" className="form-label">Distance</label>
-                    <input id="distance" type='text' class="form-control" value={flight[0].distance} disabled/>
+                    <label htmlFor="distance" className="form-label">Distance (km)</label>
+                    <input id="distance" type='text' className="form-control" value={financial(flight[0].distance)} disabled/>
                 </div>
             </div>
         </div>
         <div className='row'>
             <div className='col-12 d-flex justify-content-end'>
-                <button className='btn bg-primary text-white mx-2' onClick={onCancelClick}>
-                Cancel
-                </button>
+                <a href="/" className="btn bg-primary text-white mx-2" role="button" aria-pressed="true">
+                    Cancel
+                </a>
                 <button className='btn bg-danger text-white' onClick={onSubmitClick}>
-                Submit
+                    Submit
                 </button>
             </div>
         </div>

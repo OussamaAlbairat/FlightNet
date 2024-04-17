@@ -1,17 +1,26 @@
 import { useState } from 'react'
-import { getApiData } from './Utils.jsx'
+import { getApiData, deleteApiData } from './Utils.jsx'
 
 
 function FlightListing() {
   const [list, setList] = useState([])
   
-  const onButtonClick = (e) => {
+  const onRefreshClick = (e) => {
 		const run = async () => {
 			const lst = await getApiData("http://localhost:5065/Flights")
 			console.log(lst)
 			setList(lst)
 		}
 		run()
+  }
+
+  const deleteFlight = (url) => {
+	const run = async () => {
+		await deleteApiData(url)
+		const lst = await getApiData("http://localhost:5065/Flights")
+		setList(lst)
+	}
+	run()
   }
 
   return (
@@ -23,6 +32,8 @@ function FlightListing() {
 					<th>Origin</th>
 					<th>Destination</th>
 					<th>Plane</th>
+					<th></th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -32,17 +43,27 @@ function FlightListing() {
 							<td>{x.originCityName}</td>
 							<td>{x.destinationCityName}</td>
 							<td>{x.planeNameAndNumber}</td>
+							<td>
+								<a href={`details/${x.flightId}`}>
+									<i className="bi bi-pencil-square"></i>
+								</a>
+							</td>
+							<td>
+								<a href="#" onClick={(e)=> { deleteFlight(`http://localhost:5065/Flights?id=${x.flightId}`) }}>
+									<i className="bi bi-file-x"></i>
+								</a>
+							</td>
 						</tr>))
 				}
 			</tbody>			
 		</table>
 		<div className='d-flex justify-content-end'>
-			<button className='btn bg-primary text-white mx-2' onClick={onButtonClick}>
-			Get
+			<button className='btn bg-primary text-white mx-2' onClick={onRefreshClick}>
+				Refresh
 			</button>
-			<button className='btn bg-danger text-white' onClick={onButtonClick}>
-			Create
-			</button>
+			<a href="details" className="btn btn-danger " role="button" aria-pressed="true">
+				Create
+            </a>
 		</div>
     </div>
   )

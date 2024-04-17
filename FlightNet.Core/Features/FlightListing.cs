@@ -5,6 +5,7 @@ namespace FlightNet.Core.Features;
 public class FlightListing {
 
     public class ListingItem {
+        public int FlightId { get; set; }
         public string OriginCityName { get; set; } = string.Empty;
         public string DestinationCityName { get; set; } = string.Empty;
         public string PlaneNameAndNumber { get; set; } = string.Empty;
@@ -20,7 +21,8 @@ public class FlightListing {
         return _FlightRepository
             .GetFlights()
             .Select(f => new ListingItem() { 
-                OriginCityName = f.Origin.Name
+                FlightId = f.FlightId
+                , OriginCityName = f.Origin.Name
                 , DestinationCityName = f.Destination.Name
                 , PlaneNameAndNumber = $"{f.Plane.Name} - {f.Plane.Number}"
                 })
