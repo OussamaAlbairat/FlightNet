@@ -14,26 +14,55 @@ export const getApiData = async (uri) => {
 }
 
 export const postApiData = async (uri, data) => {
+    console.log(data)
+    let result = {status:"OK", message: "OK"}
     const headers = new Headers()
     headers.append("Content-Type", "application/json")
     const options = { method: "POST", headers: headers, body: JSON.stringify(data) }
-    const resp = uri ? await fetch(uri, options) : null
-    const dt = resp ? await resp.json() : []
-    return dt
+    try {
+        const resp = await fetch(uri, options)
+        result = (resp.ok) ? { status:"OK", message: "Create!"} 
+                                 : { status:"NOK", message: await resp.text()}
+    
+    }
+    catch(error) {
+        result = { status:"NOK", message: error}
+        console.log(error)
+    }
+    return result
 }
 
 export const putApiData = async (uri, data) => {
+    console.log(data)
+    let result = {status:"OK", message: "OK"}
     const headers = new Headers()
     headers.append("Content-Type", "application/json")
     const options = { method: "PUT", headers: headers, body: JSON.stringify(data) }
-    const resp = uri ? await fetch(uri, options) : null
-    const dt = resp ? await resp.json() : []
-    return dt
+    try {
+        const resp = await fetch(uri, options)
+        result = (resp.ok) ? { status:"OK", message: "Update!"} 
+                                 : { status:"NOK", message: await resp.text()}
+    
+    }
+    catch(error) {
+        result = { status:"NOK", message: error}
+        console.log(error)
+    }
+    return result
 }
 
 export const deleteApiData = async (uri) => {
     const options = { method: "DELETE" }
-    const resp = uri ? await fetch(uri, options) : null
-    const dt = resp ? await resp.json() : []
-    return dt
+    let result = {status:"OK", message: "OK"}
+    try {
+        const resp = await fetch(uri, options)
+        result = (resp.ok) ? { status:"OK", message: "Delete!"} 
+                                 : { status:"NOK", message: await resp.text()}
+    
+    }
+    catch(error) {
+        result = { status:"NOK", message: error}
+        console.log(error)
+    }
+    return result
 }

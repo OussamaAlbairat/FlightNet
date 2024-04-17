@@ -11,20 +11,25 @@ public class FlightCreate {
         public int PlaneId { get; set; }
     }
 
+    private readonly FlightValidate _FlightValidate;
     private readonly IFlightRepository _FlightRepository;
     public FlightCreate(IFlightRepository flightRepository)
     {
         _FlightRepository = flightRepository;
+        _FlightValidate = new FlightValidate();
     }
     public bool Create(CreateItem item) {
+#pragma warning disable CS8601 // Possible null reference assignment.
         var flight = new Flight() {
             Origin = _FlightRepository.GetCities()
-                .First(c => c.CityId == item.OriginCityId)
+                .FirstOrDefault(c => c.CityId == item.OriginCityId)
             , Destination = _FlightRepository.GetCities()
-                .First(c => c.CityId == item.DestinationCityId)
+                .FirstOrDefault(c => c.CityId == item.DestinationCityId)
             , Plane = _FlightRepository.GetPlanes()
-                .First(c => c.PlaneId == item.PlaneId)
+                .FirstOrDefault(c => c.PlaneId == item.PlaneId)
         };
+#pragma warning restore CS8601 // Possible null reference assignment.
+        _FlightValidate.Assert(flight);
         return _FlightRepository
             .AddFlight(flight);
     }

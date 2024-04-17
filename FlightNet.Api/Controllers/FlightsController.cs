@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FlightNet.Core.Features;
 using System.Net;
+using FlightNet.Core.Contracts;
 
 namespace FlightNet.Api.Controllers;
 
@@ -42,13 +43,23 @@ public class FlightsController : ControllerBase
 
     [HttpPost()]
     public ActionResult Post([FromBody] FlightCreate.CreateItem item) {
-        _FlightCreate.Create(item);
+        try {
+            _FlightCreate.Create(item);
+        }
+        catch (ValidationException ex) {
+            return BadRequest(ex.Message);
+        }
         return Ok(HttpStatusCode.Created);
     }
 
     [HttpPut()]
     public ActionResult Put([FromBody] FlightUpdate.UpdateItem item) {
-        _FlightUpdate.Update(item);
+        try {
+            _FlightUpdate.Update(item);
+        }
+        catch (ValidationException ex) {
+            return BadRequest(ex.Message);
+        }
         return Ok(HttpStatusCode.OK);
     }
 

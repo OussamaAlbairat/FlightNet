@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from "react-router-dom"
+import Alert from './Alert.jsx'
 import { getApiData, postApiData, putApiData, financial, isInteger } from './Utils.jsx'
 
 
@@ -7,11 +8,14 @@ function FlightDetails() {
 
   const { id } = useParams()
 
+  const [error, setError] = useState(null)
+  const [message, setMessage] = useState(null)
+
   const [flight, setFlight] = useState([{
-    flightId:null,
-    originCityId: null,
-    destinationCityId: null,
-    planeId: null
+    flightId:0,
+    originCityId: 0,
+    destinationCityId: 0,
+    planeId: 0
   }])
   
   const [cities, setCities] = useState([])
@@ -21,23 +25,20 @@ function FlightDetails() {
   useEffect(()=> {
     const initialize = async () => {
         const cts = await getApiData("http://localhost:5065/Cities")
-        console.log(cts)
         setCities(cts)
 
         const pls = await getApiData("http://localhost:5065/Planes")
-        console.log(pls)
         setPlanes(pls)
 
         const url = isInteger(id) ? `http://localhost:5065/Flights/${id}`:null
         const flt = url ? await getApiData(url) : [{
-            flightId:null,
-            originCityId: null,
-            destinationCityId: null,
-            planeId: null,
-            consumption,
-            distance
+            flightId:0,
+            originCityId: 0,
+            destinationCityId: 0,
+            planeId: 0,
+            consumption: 0.0,
+            distance: 0.0
           }]
-        console.log(flt)
         setFlight(flt)
     }
     initialize()
@@ -63,19 +64,23 @@ function FlightDetails() {
 
   const onSubmitClick = (e) => {
 		const run = async () => {
-            id ? await putApiData("http://localhost:5065/Flights", 
-                {
-                    flightId:flight[0].flightId,
-                    originCityId: flight[0].originCityId,
-                    destinationCityId: flight[0].destinationCityId,
-                    planeId: flight[0].planeId
-                })
-               : await postApiData("http://localhost:5065/Flights", 
-                {
-                    originCityId: flight[0].originCityId,
-                    destinationCityId: flight[0].destinationCityId,
-                    planeId: flight[0].planeId
-                })
+            const result = 
+                id ? await putApiData("http://localhost:5065/Flights", 
+                    {
+                        flightId:flight[0].flightId,
+                        originCityId: flight[0].originCityId,
+                        destinationCityId: flight[0].destinationCityId,
+                        planeId: flight[0].planeId
+                    })
+                    : await postApiData("http://localhost:5065/Flights", 
+                    {
+                        originCityId: flight[0].originCityId,
+                        destinationCityId: flight[0].destinationCityId,
+                        planeId: flight[0].planeId
+                    })
+            setError(result.status!="OK")
+            setMessage(result.message)
+            console.log(result)
 		}
 		run()
   }
@@ -86,6 +91,7 @@ function FlightDetails() {
   return (
     <div className='container'>
 		<h3 className='text-left'>Flight</h3>
+        <Alert error={error} message={message}/>
         <div className='row'>
             <div className='col-8'>
                 <div className="mb-3">
@@ -123,7 +129,7 @@ function FlightDetails() {
                     <select id="planeName" className="form-select" onChange={onPlaneChanged}>
                         {(!flight.length || flight[0].planeId == null)? 
                                 (<option value={0} selected>Select plane</option>)    
-                                :(<option value={0}>Select city</option>)}
+                                :(<option value={0}>Select plane</option>)}
                         {planes.map((x, index)=>{
                             if (flight.length && flight[0].planeId == x.planeId) {
                                 return (<option key={index} value={x.planeId} selected>{x.planeNameAndNumber}</option>)

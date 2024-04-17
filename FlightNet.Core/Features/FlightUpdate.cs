@@ -12,25 +12,30 @@ public class FlightUpdate {
         public int PlaneId { get; set; }
     }
 
+    private readonly FlightValidate _FlightValidate;
     private readonly IFlightRepository _FlightRepository;
     public FlightUpdate(IFlightRepository flightRepository)
     {
         _FlightRepository = flightRepository;
+        _FlightValidate = new FlightValidate();
     }
     public bool Update(UpdateItem item) {
         var flight = _FlightRepository
             .GetFlight(item.FlightId)
             .Select(f => {
+#pragma warning disable CS8601 // Possible null reference assignment.
                     f.Origin = _FlightRepository.GetCities()
-                        .First(c => c.CityId == item.OriginCityId);
+                        .FirstOrDefault(c => c.CityId == item.OriginCityId);
                     f.Destination = _FlightRepository.GetCities()
-                        .First(c => c.CityId == item.DestinationCityId);
+                        .FirstOrDefault(c => c.CityId == item.DestinationCityId);
                     f.Plane = _FlightRepository.GetPlanes()
-                        .First(c => c.PlaneId == item.PlaneId);
+                        .FirstOrDefault(c => c.PlaneId == item.PlaneId);
                     return f; 
+#pragma warning restore CS8601 // Possible null reference assignment.
                 }
             )
             .First();
+        _FlightValidate.Assert(flight);
         return _FlightRepository
             .UpdateFlight(flight);
     }
