@@ -16,6 +16,7 @@ function FlightListing() {
 
   const deleteFlight = (url) => {
 	const run = async () => {
+		if (!confirm("Do you want to delete this flight?")) return
 		await deleteApiData(url)
 		const lst = await getApiData("http://localhost:5065/Flights")
 		setList(lst)

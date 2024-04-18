@@ -12,11 +12,11 @@ const None = {},
     message: "Operation succeded.",
   }
 
-const Alert = ({ error, message }) => {
+const Alert = ({ error, setError, message }) => {
   const [status, setStatus] = useState(None)
 
   const closeHandler = (e) => {
-    setStatus(None)
+    setError(null)
   }
 
   useEffect(() => {

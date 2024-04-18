@@ -8,6 +8,10 @@ function FlightDetails() {
 
   const { id } = useParams()
 
+  const [id_, setId_] = useState(id)
+
+  const [refresh, setRefresh] = useState(0)
+
   const [error, setError] = useState(null)
   const [message, setMessage] = useState(null)
 
@@ -15,7 +19,9 @@ function FlightDetails() {
     flightId:0,
     originCityId: 0,
     destinationCityId: 0,
-    planeId: 0
+    planeId: 0,
+    consumption: 0.0,
+    distance: 0.0
   }])
   
   const [cities, setCities] = useState([])
@@ -29,8 +35,13 @@ function FlightDetails() {
 
         const pls = await getApiData("http://localhost:5065/Planes")
         setPlanes(pls)
+    }
+    initialize()
+  }, [])
 
-        const url = isInteger(id) ? `http://localhost:5065/Flights/${id}`:null
+  useEffect(()=> {
+    const initialize = async () => {
+        const url = isInteger(id_) ? `http://localhost:5065/Flights/${id_}`:null
         const flt = url ? await getApiData(url) : [{
             flightId:0,
             originCityId: 0,
@@ -42,7 +53,7 @@ function FlightDetails() {
         setFlight(flt)
     }
     initialize()
-  }, [])
+  }, [id_, refresh])
 
   const onOriginCityChanged = (e) => {
     setFlight((old)=> {
@@ -65,7 +76,7 @@ function FlightDetails() {
   const onSubmitClick = (e) => {
 		const run = async () => {
             const result = 
-                id ? await putApiData("http://localhost:5065/Flights", 
+                id_ ? await putApiData("http://localhost:5065/Flights", 
                     {
                         flightId:flight[0].flightId,
                         originCityId: flight[0].originCityId,
@@ -78,6 +89,10 @@ function FlightDetails() {
                         destinationCityId: flight[0].destinationCityId,
                         planeId: flight[0].planeId
                     })
+            if (result.status == "OK" && result.data && result.data.flightId) {
+                setId_(result.data.flightId)
+            }
+            else if(result.status == "OK") setRefresh(refresh + 1)
             setError(result.status!="OK")
             setMessage(result.message)
             console.log(result)
@@ -85,13 +100,10 @@ function FlightDetails() {
 		run()
   }
 
-  const onCancelClick = (e) => {
-  }
-
   return (
     <div className='container'>
 		<h3 className='text-left'>Flight</h3>
-        <Alert error={error} message={message}/>
+        <Alert error={error} message={message} setError={setError}/>
         <div className='row'>
             <div className='col-8'>
                 <div className="mb-3">

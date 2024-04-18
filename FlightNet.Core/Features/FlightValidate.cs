@@ -5,6 +5,11 @@ namespace FlightNet.Core.Features;
 
 public class FlightValidate { 
 
+    private readonly IFlightRepository _FlightRepository;
+    public FlightValidate(IFlightRepository flightRepository)
+    {
+        _FlightRepository = flightRepository;
+    }
     public void Assert(Flight flight) {
         if (flight is null) 
             throw new ValidationException("Flight is empty");
@@ -14,5 +19,12 @@ public class FlightValidate {
             throw new ValidationException("Flight Origin is not valid");
         if (flight.Destination is null) 
             throw new ValidationException("Flight Destination is not valid");
+        if (flight.Origin.CityId == flight.Destination.CityId) 
+            throw new ValidationException("Flight Origin and Destination cannot be the same");
+        if (_FlightRepository.FlightAlreadyExists(flight.FlightId
+            , flight.Plane.PlaneId
+            , flight.Origin.CityId
+            , flight.Destination.CityId))
+            throw new ValidationException("Flight Already exists");
     }
 }

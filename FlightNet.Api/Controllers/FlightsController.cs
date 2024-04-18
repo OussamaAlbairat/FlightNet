@@ -44,12 +44,12 @@ public class FlightsController : ControllerBase
     [HttpPost()]
     public ActionResult Post([FromBody] FlightCreate.CreateItem item) {
         try {
-            _FlightCreate.Create(item);
+            var resp = _FlightCreate.Create(item);
+            return Ok(resp);
         }
         catch (ValidationException ex) {
             return BadRequest(ex.Message);
         }
-        return Ok(HttpStatusCode.Created);
     }
 
     [HttpPut()]
@@ -60,7 +60,7 @@ public class FlightsController : ControllerBase
         catch (ValidationException ex) {
             return BadRequest(ex.Message);
         }
-        return Ok(HttpStatusCode.OK);
+        return Ok(HttpStatusCode.NoContent);
     }
 
     [HttpDelete()]

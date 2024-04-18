@@ -11,14 +11,18 @@ public class FlightCreate {
         public int PlaneId { get; set; }
     }
 
+    public class CreateItemResponse {
+        public int FlightId { get; set; }
+    }
+
     private readonly FlightValidate _FlightValidate;
     private readonly IFlightRepository _FlightRepository;
     public FlightCreate(IFlightRepository flightRepository)
     {
         _FlightRepository = flightRepository;
-        _FlightValidate = new FlightValidate();
+        _FlightValidate = new FlightValidate(flightRepository);
     }
-    public bool Create(CreateItem item) {
+    public CreateItemResponse Create(CreateItem item) {
 #pragma warning disable CS8601 // Possible null reference assignment.
         var flight = new Flight() {
             Origin = _FlightRepository.GetCities()
@@ -30,8 +34,8 @@ public class FlightCreate {
         };
 #pragma warning restore CS8601 // Possible null reference assignment.
         _FlightValidate.Assert(flight);
-        return _FlightRepository
-            .AddFlight(flight);
+        _FlightRepository.AddFlight(flight);
+        return new CreateItemResponse() { FlightId = flight.FlightId };
     }
 
 }

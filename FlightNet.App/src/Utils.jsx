@@ -21,8 +21,8 @@ export const postApiData = async (uri, data) => {
     const options = { method: "POST", headers: headers, body: JSON.stringify(data) }
     try {
         const resp = await fetch(uri, options)
-        result = (resp.ok) ? { status:"OK", message: "Create!"} 
-                                 : { status:"NOK", message: await resp.text()}
+        result = (resp.ok) ? { status:"OK", message: "Create!", data: await resp.json()} 
+                           : { status:"NOK", message: await resp.text()}
     
     }
     catch(error) {
@@ -41,7 +41,7 @@ export const putApiData = async (uri, data) => {
     try {
         const resp = await fetch(uri, options)
         result = (resp.ok) ? { status:"OK", message: "Update!"} 
-                                 : { status:"NOK", message: await resp.text()}
+                           : { status:"NOK", message: await resp.text()}
     
     }
     catch(error) {
@@ -57,7 +57,7 @@ export const deleteApiData = async (uri) => {
     try {
         const resp = await fetch(uri, options)
         result = (resp.ok) ? { status:"OK", message: "Delete!"} 
-                                 : { status:"NOK", message: await resp.text()}
+                           : { status:"NOK", message: await resp.text()}
     
     }
     catch(error) {

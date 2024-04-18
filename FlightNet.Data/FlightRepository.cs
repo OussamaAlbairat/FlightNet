@@ -48,4 +48,16 @@ public class FlightRepository : IFlightRepository
         _context.Entry(flight).State = EntityState.Modified;
         return _context.SaveChanges() == 1;
     }
+
+    public bool FlightAlreadyExists(int flightId, int planeId, int originCityId, int destinationCityId) {
+        return _context.Flights
+            .Include(f=>f.Plane)
+            .Include(f=>f.Origin)
+            .Include(f=>f.Destination)
+            .Where(f=>f.FlightId != flightId 
+                    && f.Plane.PlaneId == planeId
+                    && f.Origin.CityId == originCityId
+                    && f.Destination.CityId == destinationCityId)
+            .Any();
+    }
 }

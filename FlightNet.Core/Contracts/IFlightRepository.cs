@@ -10,4 +10,5 @@ public interface IFlightRepository {
     bool AddFlight(Flight flight);
     bool RemoveFlight(Flight flight);
     bool UpdateFlight(Flight flight);
+    bool FlightAlreadyExists(int flightId, int planeId, int originCityId, int destinationCityId);
 }

@@ -17,7 +17,7 @@ public class FlightUpdate {
     public FlightUpdate(IFlightRepository flightRepository)
     {
         _FlightRepository = flightRepository;
-        _FlightValidate = new FlightValidate();
+        _FlightValidate = new FlightValidate(flightRepository);
     }
     public bool Update(UpdateItem item) {
         var flight = _FlightRepository
