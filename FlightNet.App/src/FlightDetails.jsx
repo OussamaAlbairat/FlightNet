@@ -1,3 +1,4 @@
+import { Config } from './Config.js'
 import { useState, useEffect } from 'react'
 import { useParams } from "react-router-dom"
 import Alert from './Alert.jsx'
@@ -30,10 +31,10 @@ function FlightDetails() {
 
   useEffect(()=> {
     const initialize = async () => {
-        const cts = await getApiData("http://localhost:5065/Cities")
+        const cts = await getApiData(Config.BASE_URL + "Cities")
         setCities(cts)
 
-        const pls = await getApiData("http://localhost:5065/Planes")
+        const pls = await getApiData(Config.BASE_URL + "Planes")
         setPlanes(pls)
     }
     initialize()
@@ -41,7 +42,7 @@ function FlightDetails() {
 
   useEffect(()=> {
     const initialize = async () => {
-        const url = isInteger(id_) ? `http://localhost:5065/Flights/${id_}`:null
+        const url = isInteger(id_) ? `${Config.BASE_URL}Flights/${id_}`:null
         const flt = url ? await getApiData(url) : [{
             flightId:0,
             originCityId: 0,
@@ -76,14 +77,14 @@ function FlightDetails() {
   const onSubmitClick = (e) => {
 		const run = async () => {
             const result = 
-                id_ ? await putApiData("http://localhost:5065/Flights", 
+                id_ ? await putApiData(Config.BASE_URL + "Flights", 
                     {
                         flightId:flight[0].flightId,
                         originCityId: flight[0].originCityId,
                         destinationCityId: flight[0].destinationCityId,
                         planeId: flight[0].planeId
                     })
-                    : await postApiData("http://localhost:5065/Flights", 
+                    : await postApiData(Config.BASE_URL + "Flights", 
                     {
                         originCityId: flight[0].originCityId,
                         destinationCityId: flight[0].destinationCityId,

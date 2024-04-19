@@ -1,3 +1,4 @@
+import { Config } from './Config.js'
 import { useState } from 'react'
 import { getApiData, deleteApiData } from './Utils.jsx'
 
@@ -7,7 +8,7 @@ function FlightListing() {
   
   const onRefreshClick = (e) => {
 		const run = async () => {
-			const lst = await getApiData("http://localhost:5065/Flights")
+			const lst = await getApiData(Config.BASE_URL + "Flights")
 			console.log(lst)
 			setList(lst)
 		}
@@ -18,7 +19,7 @@ function FlightListing() {
 	const run = async () => {
 		if (!confirm("Do you want to delete this flight?")) return
 		await deleteApiData(url)
-		const lst = await getApiData("http://localhost:5065/Flights")
+		const lst = await getApiData(Config.BASE_URL + "Flights")
 		setList(lst)
 	}
 	run()
